@@ -1,7 +1,7 @@
 package ru.ele638.mychatbot
 
-class JVMPlatform: Platform {
-    override val name: String = "Java ${System.getProperty("java.version")}"
+class JwmPlatform: Platform {
+    override val name: String = "Jwm platform"
 }
 
-actual fun getPlatform(): Platform = JVMPlatform()
+actual fun getPlatform(): Platform = JwmPlatform()
