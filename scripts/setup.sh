@@ -4,7 +4,9 @@ set -e  # Exit on error
 
 echo "Updating system..."
 sudo apt update
-sudo apt install unzip netstat
+
+echo "Installing necessary packages"
+sudo apt install unzip netstat default-jre
 
 echo "[Executing setup-aws.sh]"
 ./setup-aws.sh
