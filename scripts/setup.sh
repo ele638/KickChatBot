@@ -3,7 +3,10 @@
 set -e  # Exit on error
 
 echo "Updating system..."
-sudo yum update
+sudo apt update
+
+echo "[Executing setup-aws.sh]"
+./setup-aws.sh
 
 echo "[Executing setup-db.sh]"
 ./setup-db.sh

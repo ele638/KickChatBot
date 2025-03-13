@@ -3,7 +3,7 @@
 set -e  # Exit on error
 
 echo "Installing PostgreSQL..."
-sudo yum install -y postgresql postgresql-contrib
+sudo apt install -y postgresql postgresql-contrib
 
 echo "Getting parameters from SSM..."
 DB_URL=$(aws ssm get-parameter --name "/chatbot/db_name" --with-decryption --query "Parameter.Value" --output text)
