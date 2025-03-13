@@ -3,12 +3,12 @@
 set -e  # Exit on error
 
 echo "Updating system..."
-sudo apt update && sudo apt upgrade -y
+sudo yum update
 
 echo "[Executing setup-db.sh]"
-./setuo-db.sh
+./setup-db.sh
 
 echo "[Executing setup-docker.sh]"
-./setuo-docker.sh
+./setup-docker.sh
 
 echo "EC2 instance setup complete!"

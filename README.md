@@ -4,9 +4,9 @@ TODO - add Readme
 
 Required:
 1) Installed PostgreSQL server
-2) ENV variables:
-* DB_URL - database URL (ex: localhost)
-* DB_PORT - database port (ex: 5432)
-* DB_NAME - name of database (lowercase only)
-* DB_USER - database username (lowercase only)
-* DB_PASSWORD - database password
+2) SSM secure parameters
+* /chatbot/db_url - database URL (ex: localhost)
+* /chatbot/db_port - database port (ex: 5432)
+* /chatbot/db_name - name of database (lowercase only)
+* /chatbot/db_user - database username (lowercase only)
+* /chatbot/db_password - database password
