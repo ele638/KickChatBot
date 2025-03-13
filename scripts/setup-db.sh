@@ -6,7 +6,7 @@ echo "Installing PostgreSQL..."
 sudo apt install -y postgresql postgresql-contrib
 
 echo "Getting parameters from SSM..."
-DB_URL=$(aws ssm get-parameter --name "/chatbot/db_name" --with-decryption --query "Parameter.Value" --output text)
+DB_NAME=$(aws ssm get-parameter --name "/chatbot/db_name" --with-decryption --query "Parameter.Value" --output text)
 DB_URL=$(aws ssm get-parameter --name "/chatbot/db_url" --with-decryption --query "Parameter.Value" --output text)
 DB_USER=$(aws ssm get-parameter --name "/chatbot/db_user" --with-decryption --query "Parameter.Value" --output text)
 DB_PASSWORD=$(aws ssm get-parameter --name "/chatbot/db_password" --with-decryption --query "Parameter.Value" --output text)
