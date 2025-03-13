@@ -4,6 +4,7 @@ set -e  # Exit on error
 
 echo "Updating system..."
 sudo apt update
+sudo apt install unzip
 
 echo "[Executing setup-aws.sh]"
 ./setup-aws.sh
