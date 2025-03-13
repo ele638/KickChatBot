@@ -5,6 +5,13 @@ set -e  # Exit on error
 echo "Installing PostgreSQL..."
 sudo apt install -y postgresql postgresql-contrib
 
+echo "Getting parameters from SSM..."
+DB_URL=$(aws ssm get-parameter --name "/chatbot/db_name" --with-decryption --query "Parameter.Value" --output text)
+DB_URL=$(aws ssm get-parameter --name "/chatbot/db_url" --with-decryption --query "Parameter.Value" --output text)
+DB_USER=$(aws ssm get-parameter --name "/chatbot/db_user" --with-decryption --query "Parameter.Value" --output text)
+DB_PASSWORD=$(aws ssm get-parameter --name "/chatbot/db_password" --with-decryption --query "Parameter.Value" --output text)
+DB_PORT=$(aws ssm get-parameter --name "/chatbot/db_port" --with-decryption --query "Parameter.Value" --output text)
+
 echo "Configuring PostgreSQL..."
 sudo -u postgres psql <<EOF
 CREATE DATABASE $DB_NAME;
