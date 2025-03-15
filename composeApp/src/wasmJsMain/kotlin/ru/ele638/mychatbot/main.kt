@@ -3,10 +3,19 @@ package ru.ele638.mychatbot
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
 import kotlinx.browser.document
+import org.koin.compose.KoinApplication
+import ru.ele638.mychatbot.di.loginModule
+import ru.ele638.mychatbot.di.sharedModule
+import ru.ele638.mychatbot.di.viewModelModule
+import ru.ele638.mychatbot.ui.MyChatBotApp
 
 @OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     ComposeViewport(document.body!!) {
-        MyChatBotApp()
+        KoinApplication(application = {
+            modules(sharedModule, viewModelModule, loginModule)
+        }) {
+            MyChatBotApp()
+        }
     }
 }
