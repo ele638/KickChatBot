@@ -63,23 +63,39 @@ fun LoginScreen(
 fun LoginScreenContent(
     state: LoginScreenViewModel.ScreenState?,
     modifier: Modifier = Modifier,
-    loginAction: (login: String, password: String) -> Unit = { _, _ -> }
+    loginAction: (server: String, login: String, password: String) -> Unit = { _, _, _ -> }
 ) {
     Column(
         modifier = modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        var server by rememberSaveable {
+            mutableStateOf("")
+        }
         var login by rememberSaveable {
-            mutableStateOf<String?>(null)
+            mutableStateOf("")
         }
         var password by rememberSaveable {
-            mutableStateOf<String?>(null)
+            mutableStateOf("")
         }
         var passwordVisible by rememberSaveable { mutableStateOf(false) }
 
         TextField(
-            value = login.orEmpty(),
+            value = server,
+            onValueChange = { server = it },
+            enabled = state != LoginScreenViewModel.ScreenState.Loading,
+            isError = state is LoginScreenViewModel.ScreenState.Error,
+            label = {
+                Text(
+                    text = "Server",
+                    style = MaterialTheme.typography.labelSmall
+                )
+            }
+        )
+        Spacer(Modifier.height(8.dp))
+        TextField(
+            value = login,
             onValueChange = { login = it },
             enabled = state != LoginScreenViewModel.ScreenState.Loading,
             isError = state is LoginScreenViewModel.ScreenState.Error,
@@ -92,7 +108,7 @@ fun LoginScreenContent(
         )
         Spacer(Modifier.height(8.dp))
         TextField(
-            value = password.orEmpty(),
+            value = password,
             onValueChange = { password = it },
             enabled = state != LoginScreenViewModel.ScreenState.Loading,
             isError = state is LoginScreenViewModel.ScreenState.Error,
@@ -119,8 +135,8 @@ fun LoginScreenContent(
         )
         Spacer(Modifier.height(8.dp))
         Button(
-            enabled = state != LoginScreenViewModel.ScreenState.Loading && login?.isNotEmpty() == true && password?.isNotEmpty() == true,
-            onClick = { loginAction(requireNotNull(login), requireNotNull(password)) }
+            enabled = state != LoginScreenViewModel.ScreenState.Loading && server.isNotEmpty() && login.isNotEmpty() && password.isNotEmpty(),
+            onClick = { loginAction(server, login, password) }
         ) {
             when (state) {
                 is LoginScreenViewModel.ScreenState.Error -> Text(

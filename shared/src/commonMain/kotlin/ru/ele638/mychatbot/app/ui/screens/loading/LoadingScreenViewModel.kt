@@ -5,18 +5,18 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import ru.ele638.mychatbot.app.domain.session.SessionInteractor
+import ru.ele638.mychatbot.app.domain.session.AuthInteractor
 
 class LoadingScreenViewModel(
-    private val sessionInteractor: SessionInteractor
+    private val authInteractor: AuthInteractor
 ) : ViewModel() {
     private val _state = MutableSharedFlow<ScreenState>()
     val state = _state.asSharedFlow()
 
     fun checkSession() {
         viewModelScope.launch {
-            val session = sessionInteractor.getSession()
-            if (session == null) {
+            val isLoginRequired = authInteractor.isLoginRequired()
+            if (isLoginRequired) {
                 _state.emit(ScreenState.LoginRequired)
             } else {
                 _state.emit(ScreenState.SetupRequired)

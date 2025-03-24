@@ -5,27 +5,30 @@ import com.zaxxer.hikari.HikariDataSource
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
+import ru.ele638.mychatbot.database.tables.KickAuthSessions
+import ru.ele638.mychatbot.database.tables.RefreshTokens
+import ru.ele638.mychatbot.database.tables.UserConfigs
 import ru.ele638.mychatbot.database.tables.Users
 
-private val DB_URL = System.getenv("DB_URL")
-private val DB_PORT = System.getenv("DB_PORT")
-private val DB_NAME = System.getenv("DB_NAME")
-private val DB_USER = System.getenv("DB_USER")
-private val DB_PASSWORD = System.getenv("DB_PASSWORD")
+private val DATABASE_URL = System.getenv("DATABASE_URL")
+private val DATABASE_NAME = System.getenv("DATABASE_NAME")
+private val DATABASE_PORT = System.getenv("DATABASE_PORT")
+private val DATABASE_USER = System.getenv("DATABASE_USER")
+private val DATABASE_PASSWORD = System.getenv("DATABASE_PASSWORD")
 
-object DatabaseFactory {
-    fun init(): Database {
-        val config = HikariConfig().apply {
-            jdbcUrl = "jdbc:postgresql://$DB_URL:$DB_PORT/$DB_NAME"
-            driverClassName = "org.postgresql.Driver"
-            username = DB_USER
-            password = DB_PASSWORD
-            maximumPoolSize = 10
-        }
-        val dataSource = HikariDataSource(config)
-        return Database.connect(dataSource).apply {
+class DatabaseFactory {
+    private val databaseConfig = HikariConfig().apply {
+        jdbcUrl = "jdbc:postgresql://$DATABASE_URL:$DATABASE_PORT/$DATABASE_NAME"
+        username = DATABASE_USER
+        password = DATABASE_PASSWORD
+        driverClassName = "org.postgresql.Driver"
+        maximumPoolSize = 10
+    }
+
+    fun initDatabase() {
+        Database.connect(HikariDataSource(databaseConfig)).apply {
             transaction {
-                SchemaUtils.create(Users) // Ensure tables exist
+                SchemaUtils.create(Users, RefreshTokens, UserConfigs, KickAuthSessions) // Ensure tables exist
             }
         }
     }

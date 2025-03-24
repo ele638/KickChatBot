@@ -10,3 +10,7 @@ Required:
 * /chatbot/db_name - name of database (lowercase only)
 * /chatbot/db_user - database username (lowercase only)
 * /chatbot/db_password - database password
+
+3) System ENV vars:
+* DATABASE_URL - URL to Amazon RDS 
+* PGPASSWORD - password for user postgres

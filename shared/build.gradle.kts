@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
+    kotlin("plugin.serialization") version "2.1.0"
 }
 
 kotlin {
@@ -28,7 +29,7 @@ kotlin {
             val rootDirPath = project.rootDir.path
             val projectDirPath = project.projectDir.path
             commonWebpackConfig {
-                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).apply {
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer(port = 80)).apply {
                     static = (static ?: mutableListOf()).apply {
                         // Serve sources to debug inside browser
                         add(rootDirPath)
@@ -57,6 +58,11 @@ kotlin {
             implementation(libs.kotlinx.serialization.json)
             implementation(libs.kotlinx.datetime)
             implementation(libs.napier)
+            implementation(libs.ktor.client.core)
+            implementation(libs.ktor.client.cio)
+            implementation(libs.ktor.client.auth)
+            implementation(libs.ktor.client.content.negotiation)
+            implementation(libs.ktor.serialization.kotlinx.json)
         }
         androidMain.dependencies {
             implementation(libs.koin.android)
