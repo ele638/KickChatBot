@@ -9,19 +9,27 @@ import io.ktor.server.routing.routing
 import org.koin.ktor.ext.inject
 import ru.ele638.mychatbot.app.data.Platform
 import ru.ele638.mychatbot.modules.authModule
+import ru.ele638.mychatbot.modules.configModule
 import ru.ele638.mychatbot.modules.initModule
+import ru.ele638.mychatbot.modules.kickOauthRoutes
 
 private val BE_HOST = System.getenv("BE_HOST")
 private val BE_PORT = System.getenv("BE_PORT").toInt()
 
 fun main() {
-    embeddedServer(Netty, port = BE_PORT, host = BE_HOST, module = Application::module)
-        .start(wait = true)
+    embeddedServer(
+        Netty,
+        port = BE_PORT,
+        host = BE_HOST,
+        module = Application::module
+    ).start(wait = true)
 }
 
 fun Application.module() {
-    initModule()
-    authModule()
+    initModule(this)
+    authModule(this)
+    configModule(this)
+    kickOauthRoutes(this)
     val platform: Platform by inject()
     routing {
         get("/") {

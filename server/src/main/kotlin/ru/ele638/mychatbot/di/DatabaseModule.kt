@@ -4,14 +4,11 @@ import org.koin.dsl.module
 import ru.ele638.mychatbot.database.DatabaseFactory
 import ru.ele638.mychatbot.repository.KickSessionRepository
 import ru.ele638.mychatbot.repository.KickSessionRepositoryImpl
-import ru.ele638.mychatbot.repository.UserConfigRepository
-import ru.ele638.mychatbot.repository.UserConfigRepositoryImpl
 import ru.ele638.mychatbot.repository.UserRepository
 import ru.ele638.mychatbot.repository.UserRepositoryImpl
 
 val databaseModule = module {
     single { DatabaseFactory() }
     single<UserRepository> { UserRepositoryImpl(get()) }
-    single<UserConfigRepository> { UserConfigRepositoryImpl() }
-    single<KickSessionRepository> { KickSessionRepositoryImpl() }
+    single<KickSessionRepository> { KickSessionRepositoryImpl(get(), get()) }
 }

@@ -18,6 +18,8 @@ application {
 dependencies {
     implementation(projects.shared)
     implementation(libs.logback)
+    implementation(libs.ktor.client.cio)
+    implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.defaultHeaders)
@@ -58,23 +60,19 @@ tasks.withType<Zip>{
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
-tasks.register("deployToEC2") {
-    dependsOn(":server:build", ":composeApp:wasmJsBrowserDistribution")
-
+tasks.register("deployBEtoEC2") {
+    dependsOn(":server:build")
     doLast {
         val ec2Host = project.findProperty("ec2.host") as String
         val ec2User = project.findProperty("ec2.user") as String
         val keyPath = project.findProperty("ec2.keyPath") as String
         val deployDir = project.findProperty("ec2.deployDir") as String
-        val wasmDir = project.findProperty("ec2.wasmDir") as String
 
-        val jarPath = "${project(":server").buildDir}/libs/server-all.jar"
-        val wasmPath = "${project(":composeApp").buildDir}/dist/wasmJs/productionExecutable/"
+        val jarPath = "${project(":server").layout.buildDirectory}/libs/server-all.jar"
 
         val isWindows = OperatingSystem.current().isWindows
 
         val sshStopCmd = if (isWindows) {
-            listOf("cmd", "/c", "plink", "-i", keyPath, "$ec2User@$ec2Host", "sudo systemctl stop nginx")
             listOf("cmd", "/c", "plink", "-i", keyPath, "$ec2User@$ec2Host", "sudo systemctl stop chatbot")
         } else {
             listOf("ssh", "-i", keyPath, "$ec2User@$ec2Host", "sudo systemctl stop chatbot")
@@ -86,14 +84,7 @@ tasks.register("deployToEC2") {
             listOf("scp", "-i", keyPath, jarPath, "$ec2User@$ec2Host:$deployDir/server.jar")
         }
 
-        val scpWasmCmd = if (isWindows) {
-            listOf("cmd", "/c", "pscp", "-i", keyPath, "-r", wasmPath, "$ec2User@$ec2Host:$wasmDir")
-        } else {
-            listOf("scp", "-i", keyPath, "-r", wasmPath, "$ec2User@$ec2Host:$wasmDir")
-        }
-
         val sshStartCmd = if (isWindows) {
-            listOf("cmd", "/c", "plink", "-i", keyPath, "$ec2User@$ec2Host", "sudo systemctl start nginx")
             listOf("cmd", "/c", "plink", "-i", keyPath, "$ec2User@$ec2Host", "sudo systemctl start chatbot")
         } else {
             listOf("ssh", "-i", keyPath, "$ec2User@$ec2Host", "sudo systemctl start chatbot")
@@ -102,10 +93,50 @@ tasks.register("deployToEC2") {
 
         // Execute file transfers
         exec { commandLine(sshStopCmd) }
-        exec { commandLine(scpWasmCmd) }
         exec { commandLine(scpCmd) }
         exec { commandLine(sshStartCmd) }
 
-        println("Deployment to EC2 completed!")
+        println("Deployment BE to EC2 completed!")
+    }
+}
+
+tasks.register("deployWASMToEC2") {
+    dependsOn(":composeApp:wasmJsBrowserDistribution")
+
+    doLast {
+        val ec2Host = project.findProperty("ec2.host") as String
+        val ec2User = project.findProperty("ec2.user") as String
+        val keyPath = project.findProperty("ec2.keyPath") as String
+        val wasmDir = project.findProperty("ec2.wasmDir") as String
+
+        val wasmPath = "${project(":composeApp").layout.buildDirectory}/dist/wasmJs/productionExecutable/"
+
+        val isWindows = OperatingSystem.current().isWindows
+
+        val sshStopCmd = if (isWindows) {
+            listOf("cmd", "/c", "plink", "-i", keyPath, "$ec2User@$ec2Host", "sudo systemctl stop nginx")
+        } else {
+            listOf("ssh", "-i", keyPath, "$ec2User@$ec2Host", "sudo systemctl stop nginx")
+        }
+
+        val scpWasmCmd = if (isWindows) {
+            listOf("cmd", "/c", "pscp", "-i", keyPath, "-r", wasmPath, "$ec2User@$ec2Host:$wasmDir")
+        } else {
+            listOf("scp", "-i", keyPath, "-r", wasmPath, "$ec2User@$ec2Host:$wasmDir")
+        }
+
+        val sshStartCmd = if (isWindows) {
+            listOf("cmd", "/c", "plink", "-i", keyPath, "$ec2User@$ec2Host", "sudo systemctl start nginx")
+        } else {
+            listOf("ssh", "-i", keyPath, "$ec2User@$ec2Host", "sudo systemctl start nginx")
+        }
+
+
+        // Execute file transfers
+        exec { commandLine(sshStopCmd) }
+        exec { commandLine(scpWasmCmd) }
+        exec { commandLine(sshStartCmd) }
+
+        println("Deployment WASM to EC2 completed!")
     }
 }

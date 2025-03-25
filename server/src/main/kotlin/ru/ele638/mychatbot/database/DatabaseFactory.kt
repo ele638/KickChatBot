@@ -7,7 +7,6 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.ele638.mychatbot.database.tables.KickAuthSessions
 import ru.ele638.mychatbot.database.tables.RefreshTokens
-import ru.ele638.mychatbot.database.tables.UserConfigs
 import ru.ele638.mychatbot.database.tables.Users
 
 private val DATABASE_URL = System.getenv("DATABASE_URL")
@@ -28,7 +27,7 @@ class DatabaseFactory {
     fun initDatabase() {
         Database.connect(HikariDataSource(databaseConfig)).apply {
             transaction {
-                SchemaUtils.create(Users, RefreshTokens, UserConfigs, KickAuthSessions) // Ensure tables exist
+                SchemaUtils.create(Users, RefreshTokens, KickAuthSessions) // Ensure tables exist
             }
         }
     }

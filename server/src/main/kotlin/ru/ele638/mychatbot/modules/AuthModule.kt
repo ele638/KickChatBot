@@ -1,5 +1,6 @@
 package ru.ele638.mychatbot.modules
 
+import JwtConfig
 import com.auth0.jwt.exceptions.JWTVerificationException
 import io.github.aakira.napier.Napier
 import io.ktor.http.HttpStatusCode
@@ -14,34 +15,37 @@ import ru.ele638.mychatbot.app.data.network.dto.AuthResponse
 import ru.ele638.mychatbot.app.data.network.dto.ErrorResponse
 import ru.ele638.mychatbot.app.data.network.dto.LoginRequest
 import ru.ele638.mychatbot.app.data.network.dto.RefreshRequest
-import ru.ele638.mychatbot.app.data.network.dto.TokenResponse
 import ru.ele638.mychatbot.app.data.network.dto.TokenVerificationResult
 import ru.ele638.mychatbot.app.data.network.dto.TokenVerifyRequest
 import ru.ele638.mychatbot.repository.UserRepository
 import java.util.Date
 
-fun Application.authModule() {
+fun authModule(application: Application) = with(application) {
     val userRepository: UserRepository by inject()
     routing {
         post("/login") {
             val request = call.receive<LoginRequest>()
-
-            if (userRepository.isUserPasswordCorrect(request.username, request.password)) {
-                val accessToken = JwtConfig.generateAccessToken(request.username)
-                val refreshToken = JwtConfig.generateRefreshToken(request.username)
-
-                userRepository.updateUserRefreshToken(request.username, refreshToken)
-                call.respond(HttpStatusCode.OK, AuthResponse(accessToken, refreshToken))
-            } else {
+            if (!userRepository.isUserPasswordCorrect(request.username, request.password)) {
                 call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Invalid credentials"))
+                return@post
             }
+            val accessToken = JwtConfig.generateAccessToken(request.username)
+            val refreshToken = JwtConfig.generateRefreshToken(request.username)
+
+            if(!userRepository.updateUserRefreshToken(request.username, refreshToken)){
+                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Unable to save refresh token"))
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, AuthResponse(accessToken, refreshToken))
         }
 
         post("/register") {
             Napier.v("DEBUG: ${call.request.toLogString()}")
             val request = call.receive<LoginRequest>()
 
-            if (userRepository.createUser(request.username, request.password)) {
+            val userCreationResult = userRepository.createUser(request.username, request.password)
+            if (userCreationResult.isSuccess) {
                 call.respond(HttpStatusCode.OK)
             } else {
                 call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Unable to create user"))
@@ -51,13 +55,20 @@ fun Application.authModule() {
         post("/refreshToken") {
             val request = call.receive<RefreshRequest>()
             val storedRefreshToken = userRepository.verifyUserRefreshToken(request.username, request.refreshToken)
-
-            if (storedRefreshToken) {
-                val newAccessToken = JwtConfig.generateAccessToken(request.username)
-                call.respond(HttpStatusCode.OK, TokenResponse(newAccessToken))
-            } else {
+            if (!storedRefreshToken) {
                 call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Invalid refresh token"))
+                return@post
             }
+
+            val accessToken = JwtConfig.generateAccessToken(request.username)
+            val refreshToken = JwtConfig.generateRefreshToken(request.username)
+
+            if (!userRepository.updateUserRefreshToken(request.username, refreshToken)) {
+                call.respond(HttpStatusCode.InternalServerError, ErrorResponse("Unable to save refresh token"))
+                return@post
+            }
+
+            call.respond(HttpStatusCode.OK, AuthResponse(accessToken, refreshToken))
         }
 
         post("/verifyToken") {

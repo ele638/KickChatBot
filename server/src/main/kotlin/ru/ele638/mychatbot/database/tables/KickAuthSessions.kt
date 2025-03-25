@@ -8,4 +8,8 @@ object KickAuthSessions : IntIdTable() {
     val codeChallenge = varchar("code_challenge", 100)
     val codeVerifier = varchar("code_verifier", 100)
     val appCallbackUri = varchar("app_callback_uri", 255)
+    val clientId = varchar("client_id", 100)
+    val clientSecret = varchar("client_secret", 100)
+    val scopes = varchar("scopes", 255)
+    val status = varchar("session_status", 20)
 }

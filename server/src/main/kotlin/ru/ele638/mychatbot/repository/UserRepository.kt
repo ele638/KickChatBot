@@ -2,20 +2,28 @@ package ru.ele638.mychatbot.repository
 
 import JwtConfig
 import org.jetbrains.exposed.sql.*
-import org.jetbrains.exposed.sql.Op.Companion.nullOp
+import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.mindrot.jbcrypt.BCrypt
 import ru.ele638.mychatbot.data.User
-import ru.ele638.mychatbot.database.DatabaseFactory
 import ru.ele638.mychatbot.database.tables.RefreshTokens
-import ru.ele638.mychatbot.database.tables.UserConfigs
 import ru.ele638.mychatbot.database.tables.Users
 import ru.ele638.mychatbot.utils.PasswordUtil
 import java.time.LocalDateTime
 
 interface UserRepository {
-    fun createUser(username: String, password: String): Boolean
+    fun createUser(username: String, password: String): Result<User>
     fun getUser(username: String): User?
+    fun updateUserKickConfig(
+        username: String,
+        kickClientId: String,
+        kickClientSecret: String
+    ): Boolean
+    fun updateUserKickPermissionCode(
+        username: String,
+        kickPermissionCode: String
+    ): Boolean
+
     fun isUserPasswordCorrect(username: String, password: String): Boolean
     fun verifyUserRefreshToken(username: String, userRefreshToken: String): Boolean
     fun updateUserRefreshToken(username: String, newRefreshJWT: String): Boolean
@@ -24,18 +32,27 @@ interface UserRepository {
 
 class UserRepositoryImpl(
     private val passwordUtil: PasswordUtil,
-): UserRepository {
+) : UserRepository {
     // User
-    override fun createUser(username: String, password: String): Boolean {
+    override fun createUser(username: String, password: String): Result<User> {
         return transaction {
             val existingUser = Users.select { Users.username eq username }.singleOrNull()
-            if (existingUser != null) {
-                return@transaction false
+            existingUser?.let {
+                return@transaction Result.failure(IllegalStateException("User exist"))
             }
-            Users.insert {
+            Users.insertAndGetId {
                 it[this.username] = username
                 it[this.password] = passwordUtil.hashPassword(password)
-            }.insertedCount > 0
+            }.run {
+                Result.success(
+                    User(
+                        userId = this.value,
+                        username = username,
+                        kickClientId = null,
+                        kickClientSecret = null,
+                    )
+                )
+            }
         }
     }
 
@@ -43,19 +60,34 @@ class UserRepositoryImpl(
         return transaction {
             val user = Users.select { Users.username eq username }.singleOrNull()
             if (user == null) return@transaction null
-            val config =
-                UserConfigs.select { UserConfigs.userId eq user[Users.id].value }.singleOrNull()
-            if (config == null) return@transaction User(
-                username = username,
-                userId = user[Users.id].value
-            )
             User(
                 username = username,
                 userId = user[Users.id].value,
-                clientId = config[UserConfigs.kickClientId],
-                clientSecret = config[UserConfigs.kickClientSecret],
-                permissionCode = config[UserConfigs.kickPermissionCode]
+                kickClientId = user[Users.kickClientId],
+                kickClientSecret = user[Users.kickClientSecret],
+                kickPermissionCode = user[Users.kickPermissionCode]
             )
+        }
+    }
+
+    override fun updateUserKickConfig(username: String, kickClientId: String, kickClientSecret: String): Boolean {
+        return transaction {
+            Users.update(
+                { Users.username eq username}
+            ) {
+                it[Users.kickClientId] = kickClientId
+                it[Users.kickClientSecret] = kickClientSecret
+            } > 0
+        }
+    }
+
+    override fun updateUserKickPermissionCode(username: String, kickPermissionCode: String): Boolean {
+        return transaction {
+            Users.update(
+                { Users.username eq username}
+            ) {
+                it[Users.kickPermissionCode] = kickPermissionCode
+            } > 0
         }
     }
 
@@ -74,7 +106,9 @@ class UserRepositoryImpl(
                 return@transaction false
             }
             val existingToken =
-                RefreshTokens.select { RefreshTokens.userId eq user[Users.id].value }.singleOrNull()
+                RefreshTokens.select {
+                    RefreshTokens.userId eq user[Users.id].value
+                }.singleOrNull()
             existingToken != null && userRefreshToken == existingToken[RefreshTokens.refreshToken]
         }
     }
@@ -97,6 +131,7 @@ class UserRepositoryImpl(
             if (user == null) {
                 return@transaction false
             }
+            RefreshTokens.deleteWhere { userId eq user[Users.id].value }
             RefreshTokens.insert {
                 it[userId] = user[Users.id].value
                 it[refreshToken] = newRefreshJWT

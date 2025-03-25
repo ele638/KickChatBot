@@ -16,9 +16,6 @@ data class TokenVerifyRequest(val accessToken: String, val refreshToken: String)
 data class AuthResponse(val accessToken: String, val refreshToken: String)
 
 @Serializable
-data class TokenResponse(val accessToken: String)
-
-@Serializable
 data class ErrorResponse(val message: String)
 
 @Serializable

@@ -24,17 +24,11 @@ object JwtConfig {
         .withIssuer(ISSUER)
         .build()
 
-    fun getJwtRefreshVerifier(): JWTVerifier = JWT
-        .require(refreshAlgorithm)
-        .withAudience(AUDIENCE)
-        .withIssuer(ISSUER)
-        .build()
-
     fun generateAccessToken(username: String): String {
         return JWT.create()
             .withIssuer(ISSUER)
             .withAudience(AUDIENCE)
-            .withSubject(username)
+            .withClaim("username", username)
             .withExpiresAt(Date(System.currentTimeMillis() + ACCESS_EXPIRATION))
             .sign(algorithm)
     }
@@ -48,9 +42,10 @@ object JwtConfig {
             .sign(refreshAlgorithm)
     }
 
-    fun verifyToken(token: String): DecodedJWT = JWT.require(algorithm)
-        .withIssuer(ISSUER)
+    fun verifyToken(token: String): DecodedJWT = JWT
+        .require(refreshAlgorithm)
         .withAudience(AUDIENCE)
+        .withIssuer(ISSUER)
         .build()
         .verify(token)
 }

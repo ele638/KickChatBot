@@ -22,8 +22,8 @@ import ru.ele638.mychatbot.di.databaseModule
 import ru.ele638.mychatbot.di.sharedModule
 import ru.ele638.mychatbot.di.utilModule
 
-fun Application.initModule() {
-    install(Koin) {
+fun initModule(application: Application) = with(application){
+    application.install(Koin) {
         slf4jLogger()
         modules(sharedModule, databaseModule, utilModule)
     }
@@ -34,11 +34,11 @@ fun Application.initModule() {
         })
     }
     install(Authentication) {
-        jwt("auth-jwt") {
+        jwt {
             realm = "ktor server"
             verifier(JwtConfig.getJwtVerifier())
             validate { credential ->
-                if (credential.payload.getClaim("username").asString() != null) {
+                if (credential.payload.getClaim("username").asString() != "") {
                     JWTPrincipal(credential.payload)
                 } else {
                     null
