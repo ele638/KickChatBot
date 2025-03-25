@@ -12,6 +12,7 @@ import ru.ele638.mychatbot.app.data.network.dto.ConfigPermissionUpdateRequest
 import ru.ele638.mychatbot.app.data.network.dto.ConfigUpdateRequest
 import ru.ele638.mychatbot.app.data.network.dto.ErrorResponse
 import ru.ele638.mychatbot.data.ConnectKickSession
+import ru.ele638.mychatbot.kickClient.KickClient
 import ru.ele638.mychatbot.repository.KickSessionRepository
 import ru.ele638.mychatbot.repository.UserRepository
 import ru.ele638.mychatbot.utils.getUsernameFromJWT
@@ -20,6 +21,7 @@ fun configModule(application: Application) = with(application) {
 
     val userRepository by inject<UserRepository>()
     val kickSessionRepository by inject<KickSessionRepository>()
+    val kickClient by inject<KickClient>()
 
     routing {
         authenticate {
@@ -71,6 +73,20 @@ fun configModule(application: Application) = with(application) {
                     )
                 }
                 call.respond(HttpStatusCode.OK)
+            }
+        }
+
+        authenticate {
+            post("/config/kick/updateBroadcasterId") {
+                val userName =
+                    getUsernameFromJWT() ?: return@post call.respond(HttpStatusCode.Unauthorized)
+                try {
+                    val broadcasterId: Int = kickClient.getBroadcasterId(userName)
+                    userRepository.updateKickBroadcasterId(userName, broadcasterId)
+                    call.respond(HttpStatusCode.OK)
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.InternalServerError, "Error ${e.message}")
+                }
             }
         }
     }

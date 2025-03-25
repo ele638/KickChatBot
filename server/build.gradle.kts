@@ -31,7 +31,6 @@ dependencies {
     implementation(libs.ktor.server.cors)
     implementation(libs.ktor.server.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.ktor.serialization.gson)
     implementation(libs.koin.ktor)
     implementation(libs.koin.logger.slf4j)
     implementation(libs.jbcrypt)

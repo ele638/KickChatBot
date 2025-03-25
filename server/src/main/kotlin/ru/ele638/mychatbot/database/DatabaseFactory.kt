@@ -6,6 +6,7 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import ru.ele638.mychatbot.database.tables.KickAuthSessions
+import ru.ele638.mychatbot.database.tables.KickEventsSubscriptions
 import ru.ele638.mychatbot.database.tables.KickTokens
 import ru.ele638.mychatbot.database.tables.RefreshTokens
 import ru.ele638.mychatbot.database.tables.Users
@@ -32,7 +33,8 @@ class DatabaseFactory {
                     Users,
                     RefreshTokens,
                     KickAuthSessions,
-                    KickTokens
+                    KickTokens,
+                    KickEventsSubscriptions
                 ) // Ensure tables exist
             }
         }

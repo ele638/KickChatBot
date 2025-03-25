@@ -32,6 +32,7 @@ fun initModule(application: Application) = with(application){
         json(Json {
             prettyPrint = true
             isLenient = true
+            ignoreUnknownKeys = true
         })
     }
     install(Authentication) {

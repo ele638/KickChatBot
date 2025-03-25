@@ -1,9 +1,13 @@
 package ru.ele638.mychatbot.repository
 
 import JwtConfig
-import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.insertAndGetId
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import org.mindrot.jbcrypt.BCrypt
 import ru.ele638.mychatbot.data.User
 import ru.ele638.mychatbot.database.tables.RefreshTokens
@@ -14,6 +18,7 @@ import java.time.LocalDateTime
 interface UserRepository {
     fun createUser(username: String, password: String): Result<User>
     fun getUser(username: String): User?
+    fun requireUser(username: String): User
     fun updateUserKickConfig(
         username: String,
         kickClientId: String,
@@ -23,6 +28,8 @@ interface UserRepository {
         username: String,
         kickPermissionCode: String
     ): Boolean
+    fun updateKickBroadcasterId(username: String, broadcasterId: Int)
+    fun requireUserByBroadcasterId(broadcasterId: Int): User
 
     fun isUserPasswordCorrect(username: String, password: String): Boolean
     fun verifyUserRefreshToken(username: String, userRefreshToken: String): Boolean
@@ -70,6 +77,21 @@ class UserRepositoryImpl(
         }
     }
 
+    override fun requireUser(username: String): User {
+        return transaction {
+            val user = Users.select { Users.username eq username }.singleOrNull()
+            if (user == null) throw IllegalStateException("No user!")
+            User(
+                username = username,
+                userId = user[Users.id].value,
+                kickClientId = user[Users.kickClientId],
+                kickClientSecret = user[Users.kickClientSecret],
+                kickPermissionCode = user[Users.kickPermissionCode],
+                kickBroadcasterId = user[Users.kickBroadcasterId]
+            )
+        }
+    }
+
     override fun updateUserKickConfig(username: String, kickClientId: String, kickClientSecret: String): Boolean {
         return transaction {
             Users.update(
@@ -88,6 +110,31 @@ class UserRepositoryImpl(
             ) {
                 it[Users.kickPermissionCode] = kickPermissionCode
             } > 0
+        }
+    }
+
+    override fun updateKickBroadcasterId(username: String, broadcasterId: Int) {
+        return transaction {
+            Users.update(
+                { Users.username eq username }
+            ) {
+                it[kickBroadcasterId] = broadcasterId
+            }
+        }
+    }
+
+    override fun requireUserByBroadcasterId(broadcasterId: Int): User {
+        return transaction {
+            val user = Users.select { Users.kickBroadcasterId eq broadcasterId }.singleOrNull()
+            if (user == null) throw IllegalStateException("No user!")
+            User(
+                username = user[Users.username],
+                userId = user[Users.id].value,
+                kickClientId = user[Users.kickClientId],
+                kickClientSecret = user[Users.kickClientSecret],
+                kickPermissionCode = user[Users.kickPermissionCode],
+                kickBroadcasterId = broadcasterId
+            )
         }
     }
 

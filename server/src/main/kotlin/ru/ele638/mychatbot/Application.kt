@@ -13,6 +13,7 @@ import ru.ele638.mychatbot.modules.configModule
 import ru.ele638.mychatbot.modules.initModule
 import ru.ele638.mychatbot.modules.kickBotModule
 import ru.ele638.mychatbot.modules.kickOauthRoutes
+import ru.ele638.mychatbot.modules.kickWebhookModule
 
 private val BE_HOST = System.getenv("BE_HOST")
 private val BE_PORT = System.getenv("BE_PORT").toInt()
@@ -32,6 +33,7 @@ fun Application.module() {
     configModule(this)
     kickOauthRoutes(this)
     kickBotModule(this)
+    kickWebhookModule(this)
     val platform: Platform by inject()
     routing {
         get("/") {

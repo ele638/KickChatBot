@@ -8,4 +8,5 @@ object Users : IntIdTable() {
     val kickClientId = varchar("kick_client_id", 100).nullable()
     val kickClientSecret = varchar("client_secret", 255).nullable()
     val kickPermissionCode = varchar("kick_permission_code", 255).nullable()
+    val kickBroadcasterId = integer("kick_broadcaster_id").nullable()
 }

@@ -15,7 +15,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import ru.ele638.mychatbot.data.ConnectKickSession
 import ru.ele638.mychatbot.data.KickToken
-import ru.ele638.mychatbot.kickClient.models.TokenResponse
+import ru.ele638.mychatbot.kickClient.models.responses.TokenResponse
 import ru.ele638.mychatbot.repository.KickSessionRepository
 import ru.ele638.mychatbot.repository.KickTokenRepository
 import ru.ele638.mychatbot.repository.UserRepository

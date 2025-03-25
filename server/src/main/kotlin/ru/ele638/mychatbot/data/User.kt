@@ -5,5 +5,6 @@ data class User(
     val username: String,
     val kickClientId: String? = null,
     val kickClientSecret: String? = null,
-    val kickPermissionCode: String? = null
+    val kickPermissionCode: String? = null,
+    val kickBroadcasterId: Int? = null
 )
