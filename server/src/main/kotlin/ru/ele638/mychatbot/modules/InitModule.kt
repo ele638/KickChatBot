@@ -19,13 +19,14 @@ import org.koin.ktor.plugin.Koin
 import org.koin.logger.slf4jLogger
 import ru.ele638.mychatbot.database.DatabaseFactory
 import ru.ele638.mychatbot.di.databaseModule
+import ru.ele638.mychatbot.di.kickModule
 import ru.ele638.mychatbot.di.sharedModule
 import ru.ele638.mychatbot.di.utilModule
 
 fun initModule(application: Application) = with(application){
     application.install(Koin) {
         slf4jLogger()
-        modules(sharedModule, databaseModule, utilModule)
+        modules(sharedModule, databaseModule, utilModule, kickModule)
     }
     install(ContentNegotiation) {
         json(Json {

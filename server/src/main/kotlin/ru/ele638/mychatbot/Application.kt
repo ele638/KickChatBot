@@ -11,6 +11,7 @@ import ru.ele638.mychatbot.app.data.Platform
 import ru.ele638.mychatbot.modules.authModule
 import ru.ele638.mychatbot.modules.configModule
 import ru.ele638.mychatbot.modules.initModule
+import ru.ele638.mychatbot.modules.kickBotModule
 import ru.ele638.mychatbot.modules.kickOauthRoutes
 
 private val BE_HOST = System.getenv("BE_HOST")
@@ -30,6 +31,7 @@ fun Application.module() {
     authModule(this)
     configModule(this)
     kickOauthRoutes(this)
+    kickBotModule(this)
     val platform: Platform by inject()
     routing {
         get("/") {

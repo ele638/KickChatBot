@@ -18,8 +18,10 @@ application {
 dependencies {
     implementation(projects.shared)
     implementation(libs.logback)
+    implementation(libs.ktor.client.auth)
     implementation(libs.ktor.client.cio)
     implementation(libs.ktor.client.content.negotiation)
+    implementation(libs.ktor.client.logging)
     implementation(libs.ktor.server.core)
     implementation(libs.ktor.server.netty)
     implementation(libs.ktor.server.defaultHeaders)
@@ -68,7 +70,7 @@ tasks.register("deployBEtoEC2") {
         val keyPath = project.findProperty("ec2.keyPath") as String
         val deployDir = project.findProperty("ec2.deployDir") as String
 
-        val jarPath = "${project(":server").layout.buildDirectory}/libs/server-all.jar"
+        val jarPath = "${project(":server").layout.buildDirectory.get()}/libs/server-all.jar"
 
         val isWindows = OperatingSystem.current().isWindows
 
@@ -109,7 +111,8 @@ tasks.register("deployWASMToEC2") {
         val keyPath = project.findProperty("ec2.keyPath") as String
         val wasmDir = project.findProperty("ec2.wasmDir") as String
 
-        val wasmPath = "${project(":composeApp").layout.buildDirectory}/dist/wasmJs/productionExecutable/"
+        val wasmPath =
+            "${project(":composeApp").layout.buildDirectory.get()}/dist/wasmJs/productionExecutable/"
 
         val isWindows = OperatingSystem.current().isWindows
 

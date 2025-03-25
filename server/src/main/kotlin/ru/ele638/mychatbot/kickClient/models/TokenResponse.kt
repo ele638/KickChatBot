@@ -1,4 +1,4 @@
-package ru.ele638.mychatbot.data.network
+package ru.ele638.mychatbot.kickClient.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
