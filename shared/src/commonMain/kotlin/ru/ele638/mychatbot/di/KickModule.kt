@@ -8,5 +8,5 @@ import ru.ele638.mychatbot.app.domain.kick.KickConfigInteractorImpl
 
 val kickModule = module {
     single<KickConfigRepository> { KickConfigRepositoryImpl(get()) }
-    single<KickConfigInteractor> { KickConfigInteractorImpl(get(), get(), get()) }
+    single<KickConfigInteractor> { KickConfigInteractorImpl(get(), get()) }
 }

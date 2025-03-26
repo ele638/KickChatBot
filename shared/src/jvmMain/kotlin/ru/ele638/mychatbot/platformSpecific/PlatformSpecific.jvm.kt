@@ -3,16 +3,10 @@ package ru.ele638.mychatbot.platformSpecific
 import ru.ele638.mychatbot.app.data.JwmPlatform
 import ru.ele638.mychatbot.app.data.Platform
 import ru.ele638.mychatbot.app.data.storage.PrefsProvider
+import ru.ele638.mychatbot.app.storage.PrefsProviderImpl
 import ru.ele638.mychatbot.app.util.DispatchersProvider
 import ru.ele638.mychatbot.app.util.JVMDispatchersProvider
-import ru.ele638.mychatbot.app.util.UrlOpener
 
-actual fun getPrefsProvider(): PrefsProvider {
-    TODO("Not yet implemented")
-}
-
+actual fun getPrefsProvider(): PrefsProvider = PrefsProviderImpl()
 actual fun getPlatform(): Platform = JwmPlatform()
 actual fun getDispatchersProvider(): DispatchersProvider = JVMDispatchersProvider()
-actual fun getUrlOpener(): UrlOpener {
-    TODO("Not yet implemented")
-}

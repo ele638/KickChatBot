@@ -4,11 +4,9 @@ import kotlinx.coroutines.withContext
 import ru.ele638.mychatbot.app.data.kick.KickConfig
 import ru.ele638.mychatbot.app.data.kick.KickConfigRepository
 import ru.ele638.mychatbot.app.util.DispatchersProvider
-import ru.ele638.mychatbot.app.util.UrlOpener
 
 interface KickConfigInteractor {
     suspend fun getSavedConfig(): KickConfig?
-    suspend fun checkDeepLink(): String?
     suspend fun requestOauthCode(clientId: String, clientSecret: String)
     suspend fun requestToken(
         callbackCode: String,
@@ -24,26 +22,12 @@ interface KickConfigInteractor {
 
 class KickConfigInteractorImpl(
     private val repository: KickConfigRepository,
-    private val urlOpener: UrlOpener,
     private val dispatchersProvider: DispatchersProvider,
 //    private val kickClientApi: KickClientApi,
 ) : KickConfigInteractor {
 
     override suspend fun getSavedConfig(): KickConfig? {
         return repository.getConfig()
-    }
-
-    override suspend fun checkDeepLink(): String? {
-        val url = urlOpener.getDeepLink()
-        return url?.let {
-            if (url.contains("code=")) {
-                url.substringAfter("code=").substringBefore("&")
-            } else {
-                null
-            }.also {
-                urlOpener.clearDeepLink()
-            }
-        }
     }
 
     override suspend fun requestOauthCode(clientId: String, clientSecret: String) {
