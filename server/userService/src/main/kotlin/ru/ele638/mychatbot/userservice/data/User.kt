@@ -1,4 +1,4 @@
-package ru.ele638.mychatbot.data
+package ru.ele638.mychatbot.userservice.data
 
 data class User(
     val userId: Int,

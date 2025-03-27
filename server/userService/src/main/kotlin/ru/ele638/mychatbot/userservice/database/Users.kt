@@ -1,4 +1,4 @@
-package ru.ele638.mychatbot.database.tables
+package ru.ele638.mychatbot.userservice.database
 
 import org.jetbrains.exposed.dao.id.IntIdTable
 

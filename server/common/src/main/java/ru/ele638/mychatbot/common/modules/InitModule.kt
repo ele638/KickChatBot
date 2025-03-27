@@ -1,6 +1,5 @@
-package ru.ele638.mychatbot.modules
+package ru.ele638.mychatbot.common.modules
 
-import JwtConfig
 import io.github.aakira.napier.DebugAntilog
 import io.github.aakira.napier.Napier
 import io.ktor.http.HttpHeaders
@@ -14,20 +13,9 @@ import io.ktor.server.auth.jwt.jwt
 import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.server.plugins.cors.routing.CORS
 import kotlinx.serialization.json.Json
-import org.koin.ktor.ext.inject
-import org.koin.ktor.plugin.Koin
-import org.koin.logger.slf4jLogger
-import ru.ele638.mychatbot.database.DatabaseFactory
-import ru.ele638.mychatbot.di.databaseModule
-import ru.ele638.mychatbot.di.kickModule
-import ru.ele638.mychatbot.di.sharedModule
-import ru.ele638.mychatbot.di.utilModule
+import ru.ele638.mychatbot.common.security.JwtConfig
 
-fun initModule(application: Application) = with(application){
-    application.install(Koin) {
-        slf4jLogger()
-        modules(sharedModule, databaseModule, utilModule, kickModule)
-    }
+fun initModule(application: Application) = with(application) {
     install(ContentNegotiation) {
         json(Json {
             prettyPrint = true
@@ -62,9 +50,5 @@ fun initModule(application: Application) = with(application){
         anyHost()
     }
 
-
-    val databaseFactory: DatabaseFactory by inject()
-
-    databaseFactory.initDatabase()
     Napier.base(DebugAntilog())
 }

@@ -1,6 +1,5 @@
-package ru.ele638.mychatbot.modules
+package ru.ele638.mychatbot.userservice.modules
 
-import JwtConfig
 import com.auth0.jwt.exceptions.JWTVerificationException
 import io.github.aakira.napier.Napier
 import io.ktor.http.HttpStatusCode
@@ -17,13 +16,14 @@ import ru.ele638.mychatbot.app.data.network.dto.LoginRequest
 import ru.ele638.mychatbot.app.data.network.dto.RefreshRequest
 import ru.ele638.mychatbot.app.data.network.dto.TokenVerificationResult
 import ru.ele638.mychatbot.app.data.network.dto.TokenVerifyRequest
-import ru.ele638.mychatbot.repository.UserRepository
+import ru.ele638.mychatbot.common.security.JwtConfig
+import ru.ele638.mychatbot.userservice.repositories.UserRepository
 import java.util.Date
 
 fun authModule(application: Application) = with(application) {
     val userRepository: UserRepository by inject()
     routing {
-        post("/login") {
+        post("/user/login") {
             val request = call.receive<LoginRequest>()
             if (!userRepository.isUserPasswordCorrect(request.username, request.password)) {
                 call.respond(HttpStatusCode.Unauthorized, ErrorResponse("Invalid credentials"))
@@ -40,7 +40,7 @@ fun authModule(application: Application) = with(application) {
             call.respond(HttpStatusCode.OK, AuthResponse(accessToken, refreshToken))
         }
 
-        post("/register") {
+        post("/user/register") {
             Napier.v("DEBUG: ${call.request.toLogString()}")
             val request = call.receive<LoginRequest>()
 
@@ -52,7 +52,7 @@ fun authModule(application: Application) = with(application) {
             }
         }
 
-        post("/refreshToken") {
+        post("/user/refreshToken") {
             val request = call.receive<RefreshRequest>()
             val storedRefreshToken = userRepository.verifyUserRefreshToken(request.username, request.refreshToken)
             if (!storedRefreshToken) {
@@ -71,7 +71,7 @@ fun authModule(application: Application) = with(application) {
             call.respond(HttpStatusCode.OK, AuthResponse(accessToken, refreshToken))
         }
 
-        post("/verifyToken") {
+        post("/user/verifyToken") {
             val request = call.receive<TokenVerifyRequest>()
 
             val isAccessTokenValid = try {

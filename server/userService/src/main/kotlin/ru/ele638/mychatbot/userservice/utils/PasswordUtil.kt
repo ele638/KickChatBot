@@ -1,4 +1,4 @@
-package ru.ele638.mychatbot.utils
+package ru.ele638.mychatbot.userservice.utils
 
 import org.mindrot.jbcrypt.BCrypt
 

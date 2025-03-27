@@ -8,9 +8,8 @@ import io.ktor.server.routing.get
 import io.ktor.server.routing.routing
 import org.koin.ktor.ext.inject
 import ru.ele638.mychatbot.app.data.Platform
-import ru.ele638.mychatbot.modules.authModule
+import ru.ele638.mychatbot.common.modules.initModule
 import ru.ele638.mychatbot.modules.configModule
-import ru.ele638.mychatbot.modules.initModule
 import ru.ele638.mychatbot.modules.kickBotModule
 import ru.ele638.mychatbot.modules.kickOauthRoutes
 import ru.ele638.mychatbot.modules.kickWebhookModule
@@ -29,7 +28,6 @@ fun main() {
 
 fun Application.module() {
     initModule(this)
-    authModule(this)
     configModule(this)
     kickOauthRoutes(this)
     kickBotModule(this)

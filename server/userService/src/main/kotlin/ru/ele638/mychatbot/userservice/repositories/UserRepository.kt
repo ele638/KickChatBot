@@ -1,6 +1,5 @@
-package ru.ele638.mychatbot.repository
+package ru.ele638.mychatbot.userservice.repositories
 
-import JwtConfig
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
@@ -9,10 +8,11 @@ import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import org.mindrot.jbcrypt.BCrypt
-import ru.ele638.mychatbot.data.User
-import ru.ele638.mychatbot.database.tables.RefreshTokens
-import ru.ele638.mychatbot.database.tables.Users
-import ru.ele638.mychatbot.utils.PasswordUtil
+import ru.ele638.mychatbot.common.security.JwtConfig
+import ru.ele638.mychatbot.userservice.data.User
+import ru.ele638.mychatbot.userservice.database.RefreshTokens
+import ru.ele638.mychatbot.userservice.database.Users
+import ru.ele638.mychatbot.userservice.utils.PasswordUtil
 import java.time.LocalDateTime
 
 interface UserRepository {

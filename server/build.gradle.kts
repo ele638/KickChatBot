@@ -16,50 +16,9 @@ application {
 }
 
 dependencies {
-    implementation(projects.shared)
-    implementation(libs.logback)
-    implementation(libs.ktor.client.auth)
-    implementation(libs.ktor.client.cio)
-    implementation(libs.ktor.client.content.negotiation)
-    implementation(libs.ktor.client.logging)
-    implementation(libs.ktor.server.core)
-    implementation(libs.ktor.server.netty)
-    implementation(libs.ktor.server.defaultHeaders)
-    implementation(libs.ktor.server.auth)
-    implementation(libs.ktor.server.auth.jwt)
-    implementation(libs.ktor.server.sessions)
-    implementation(libs.ktor.server.cors)
-    implementation(libs.ktor.server.content.negotiation)
-    implementation(libs.ktor.serialization.kotlinx.json)
-    implementation(libs.koin.ktor)
-    implementation(libs.koin.logger.slf4j)
-    implementation(libs.jbcrypt)
-    implementation(libs.napier)
-    implementation(kotlincrypto.hash.sha2)
-    implementation(libs.dotenv.kotlin)
-    testImplementation(libs.kotlin.test.junit)
-
-    implementation(libs.exposed.core)
-    implementation(libs.exposed.dao)
-    implementation(libs.exposed.java.time)
-    implementation(libs.exposed.jdbc)
-    implementation(libs.postgresql)
-    implementation(libs.hikaricp) // Connection pooling
+    implementation(projects.server.common)
 }
 
-tasks.withType<Jar> {
-    manifest {
-        attributes["Main-Class"] = application.mainClass
-    }
-}
-
-tasks.withType<Tar>{
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-tasks.withType<Zip>{
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
 
 tasks.register("deployBEtoEC2") {
     dependsOn(":server:build")

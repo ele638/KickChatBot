@@ -1,8 +1,10 @@
+package ru.ele638.mychatbot.common.security
+
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.interfaces.DecodedJWT
-import java.util.*
+import java.util.Date
 
 object JwtConfig {
     private val BE_JWT_SECRET = System.getenv("BE_JWT_SECRET")
