@@ -58,4 +58,8 @@ dependencies {
     api(libs.grpc.netty.shaded)
     api(libs.grpc.protobuf)
     api(libs.protobuf.kotlin)
+
+    // Metrics
+    api(libs.ktor.server.metrics.micrometer)
+    api(libs.micrometer.registry.prometheus)
 }

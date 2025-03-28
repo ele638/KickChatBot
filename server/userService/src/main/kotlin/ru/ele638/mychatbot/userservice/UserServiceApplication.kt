@@ -13,14 +13,11 @@ import ru.ele638.mychatbot.userservice.database.Users
 import ru.ele638.mychatbot.userservice.di.userServiceModule
 import ru.ele638.mychatbot.userservice.modules.authModule
 
-private val BE_HOST = System.getenv("BE_HOST")
-private val BE_PORT = System.getenv("BE_PORT").toInt()
-
 fun main() {
     embeddedServer(
         Netty,
-        port = BE_PORT,
-        host = BE_HOST,
+        port = 80,
+        host = "0.0.0.0",
         module = Application::module
     ).start(wait = true)
 }
